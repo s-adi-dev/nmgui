@@ -1,0 +1,18 @@
+# Virtual environment files
+bin/
+lib/
+lib64/
+lib64
+include/
+pyvenv.cfg
+
+# Python cache and build files
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+
+# Other IDE/Editor files
+.idea/
+.vscode/
+*.swp
