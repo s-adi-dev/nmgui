@@ -47,18 +47,6 @@ class StyleManager:
         padding: 5px 0;
     }
 
-    #network-button { 
-        margin: 0;
-        border-radius: 8px 0 0 8px;
-    }
-
-    .more-details-button {
-        border: none;
-        box-shadow: none;
-        margin: 0;
-        border-radius: 0 8px 8px 0;
-    }
-
     .connected-network {
         background-color: rgba(74, 144, 217, 0.1);
     }
@@ -99,10 +87,6 @@ class StyleManager:
         font-size: 0.9rem;
     }
     
-    button {
-        border-radius: 0;
-    }        
-
     scrollbar slider {
         min-width: 6px;
         min-height: 6px;

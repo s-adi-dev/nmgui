@@ -123,8 +123,6 @@ class NetworkListWidget(Gtk.Box):
     def _create_network_row(self, network: NetworkInfo) -> Gtk.Box:
         """Create a row for a network with connect button and more button"""
         row_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
-        row_box.set_margin_top(2)
-        row_box.set_margin_bottom(2)
         
         # Main network button
         network_button = self._create_network_button(network)
