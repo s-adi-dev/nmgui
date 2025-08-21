@@ -1,0 +1,8 @@
+feat: standardize UI elements
+
+- Update CSS styles to ensure consistent heights across all text/input boxes
+- Add min-height: 30px to WiFi label, title elements, and entry fields
+- Add password-entry CSS class for consistent password field styling
+- Fix padding typo in network button styling
+- Update PasswordDialog to use new CSS classes
+- Improve overall UI consistency and spacing

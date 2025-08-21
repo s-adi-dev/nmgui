@@ -59,6 +59,11 @@ class NmcliExtensions:
 class NetworkService:
     """Service class to handle network operations"""
     
+    # Cache for network scan results
+    _scan_cache = None
+    _last_scan_time = 0
+    _scan_cache_duration = 2.0  # Cache for 2 seconds
+    
     @staticmethod
     def get_wifi_status() -> bool:
         """Check Wi-Fi status"""
@@ -88,21 +93,33 @@ class NetworkService:
     @staticmethod
     def scan_networks(force_rescan: bool = True) -> List[NetworkInfo]:
         """Scan for available networks with optional force rescan"""
+        # Check if we can use cached results
+        current_time = time.time()
+        if (not force_rescan and 
+            NetworkService._scan_cache is not None and
+            (current_time - NetworkService._last_scan_time) < NetworkService._scan_cache_duration):
+            print("Using cached network scan results")
+            return NetworkService._scan_cache
+        
         networks = []
         try:
             if force_rescan:
                 NmcliExtensions.wifi_force_rescan(nmcli.device)
-                time.sleep(0.5)  # Allow rescan to complete
+                time.sleep(0.1)  # Reduced sleep time for faster scanning
             
             for wifi in nmcli.device.wifi():
                 if not wifi.ssid:
                     continue
-                
+                    
                 # Use the new NetworkInfo.from_wifi_device method
                 network = NetworkInfo.from_wifi_device(wifi)
                 networks.append(network)
                 
             print(f"Found {len(networks)} networks")
+            
+            # Update cache
+            NetworkService._scan_cache = networks
+            NetworkService._last_scan_time = current_time
             
         except Exception as e:
             print(f"Error scanning networks: {e}")
@@ -118,6 +135,12 @@ class NetworkService:
         except Exception as e:
             print(f"Error checking known networks: {e}")
             return False
+
+    @staticmethod
+    def clear_scan_cache():
+        """Clear the network scan cache"""
+        NetworkService._scan_cache = None
+        NetworkService._last_scan_time = 0
 
     @staticmethod
     def forget_wifi(ssid: str) -> Tuple[bool, str]:
@@ -144,6 +167,9 @@ class NetworkService:
                 # Verify deletion was successful
                 if NetworkService.is_wifi_known(ssid):
                     return False, f"Failed to forget network '{ssid}' - still exists after deletion"
+                
+                # Clear scan cache since we've modified network connections
+                NetworkService.clear_scan_cache()
                     
                 return True, f"Successfully forgot network: '{ssid}'"
                 
@@ -168,6 +194,9 @@ class NetworkService:
             else:
                 NmcliExtensions.connect_to_open_or_saved_wifi(nmcli.device, ssid)
             
+            # Clear scan cache since we've modified network connections
+            NetworkService.clear_scan_cache()
+            
             return True, "Connected successfully"
             
         except nmcli._exception.ConnectionActivateFailedException as e:
@@ -180,6 +209,8 @@ class NetworkService:
         """Disconnect to a network using improved disconnection method"""
         try:
             nmcli.connection.down(ssid)
+            # Clear scan cache since we've modified network connections
+            NetworkService.clear_scan_cache()
             return True, "Disconnected Successfully"
         except Exception as e:
             return False, f"Connection error: {str(e)}"

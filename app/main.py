@@ -13,10 +13,10 @@ __version__ = "1.0.0"
 
 class NetworkManagerApp(Gtk.Application):
     """Main application class"""
-    
+
     def __init__(self):
         super().__init__(application_id="com.network.manager")
-    
+
     def do_activate(self):
         """Application activation"""
         StyleManager.apply_styles()
@@ -29,24 +29,24 @@ def parse_arguments():
         description="Network Manager - A GTK4 network management application",
         prog="network-manager"
     )
-    
+
     parser.add_argument(
         "-v", "--version",
         action="version",
         version=f"%(prog)s {__version__}"
     )
-    
+
     return parser.parse_args()
 
 if __name__ == "__main__":
     try:
         # Parse command line arguments first
         args = parse_arguments()
-        
+
         # Check if NetworkManager is available before starting the app
         if not NetworkService.check_networkmanager():
             sys.exit(1)
-        
+
         # If we get here, NetworkManager is available, so start the app
         app = NetworkManagerApp()
         app.run()

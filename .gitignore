@@ -5,12 +5,15 @@ lib64/
 lib64
 include/
 pyvenv.cfg
+venv/
+build_env/
 
 # Python cache and build files
 __pycache__/
 *.py[cod]
 *.egg-info/
 dist/
+test/
 
 # Other IDE/Editor files
 .idea/
