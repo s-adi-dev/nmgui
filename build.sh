@@ -94,8 +94,9 @@ build_application() {
         nuitka
         --standalone
         --onefile
-        --include-package-data=gi
+        --include-package=gi
         --include-module=nmcli
+        --include-module=cairo
         --follow-imports
         --output-dir="../dist"
         --remove-output
