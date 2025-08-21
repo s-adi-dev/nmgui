@@ -88,8 +88,13 @@ class NetworkManagerWindow(Gtk.ApplicationWindow):
         self.network_list = NetworkListWidget(self._on_network_selected, self._on_network_details)
         self.content_box.append(self.network_list)
 
+        # Always populate the network list, either immediately or shortly after
         if scan_immediately:
-            GLib.timeout_add(500, lambda: self.network_list.start_scan())
+            # Use cached data for faster initial display
+            GLib.timeout_add(50, lambda: self.network_list.refresh_with_cached_data())
+        else:
+            # For navigation back from details, still populate with current data
+            GLib.timeout_add(50, lambda: self.network_list.refresh_with_cached_data())
 
     def _show_network_details(self, network: NetworkInfo):
         """Show the network details widget"""
@@ -101,7 +106,8 @@ class NetworkManagerWindow(Gtk.ApplicationWindow):
 
     def _on_back_to_list(self):
         """Handle back button click from details view"""
-        self._show_network_list(scan_immediately=True)
+        # Use cached results when returning to list view for better performance
+        self._show_network_list(scan_immediately=False)
 
     def _show_wifi_off(self):
         """Show the WiFi off widget"""

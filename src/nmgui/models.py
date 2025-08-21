@@ -28,15 +28,16 @@ class NetworkInfo:
     @classmethod
     def from_wifi_device(cls, wifi_device):
         """Create NetworkInfo from nmcli wifi device"""
+        # Use getattr with defaults for better performance and error handling
         return cls(
-            ssid=wifi_device.ssid,
-            signal=wifi_device.signal,
-            requires_password=bool(wifi_device.security),
-            is_connected=wifi_device.in_use,
-            bssid=wifi_device.bssid,
-            frequency=wifi_device.freq,
-            channel=wifi_device.chan,
-            rate=wifi_device.rate,
-            mode=wifi_device.mode,
-            security=wifi_device.security
+            ssid=getattr(wifi_device, 'ssid', ''),
+            signal=getattr(wifi_device, 'signal', 0),
+            requires_password=bool(getattr(wifi_device, 'security', None)),
+            is_connected=getattr(wifi_device, 'in_use', False),
+            bssid=getattr(wifi_device, 'bssid', None),
+            frequency=getattr(wifi_device, 'freq', None),
+            channel=getattr(wifi_device, 'chan', None),
+            rate=getattr(wifi_device, 'rate', None),
+            mode=getattr(wifi_device, 'mode', None),
+            security=getattr(wifi_device, 'security', None)
         )

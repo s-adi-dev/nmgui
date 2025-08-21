@@ -63,11 +63,13 @@ class UIUtils:
         label_widget = Gtk.Label(label=label)
         label_widget.set_xalign(0)
         label_widget.set_css_classes(["dim-label"])
+        label_widget.set_ellipsize(3)  # Ellipsize at end for better performance
         text_box.append(label_widget)
 
         value_widget = Gtk.Label(label=value)
         value_widget.set_xalign(0)
-        value_widget.set_ellipsize(3)  # Ellipsize at end
+        value_widget.set_ellipsize(3)  # Ellipsize at end for better performance
+        value_widget.set_selectable(True)  # Allow copying values
         text_box.append(value_widget)
 
         row.append(text_box)

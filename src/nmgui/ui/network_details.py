@@ -369,14 +369,34 @@ class NetworkDetailsWidget(Gtk.Box):
         self._create_action_buttons()
 
     def _load_advanced_info(self):
-        """Load advanced network information in background"""
+        """Load advanced network information efficiently"""
         def load_info_thread():
             try:
                 wifi_details = None
-                for wifi in nmcli.device.wifi():
-                    if wifi.ssid == self.network.ssid:
-                        wifi_details = wifi
+                # First try to get fresh data without forcing a rescan
+                networks = NetworkService.scan_networks(force_rescan=False)
+                for network in networks:
+                    if network.ssid == self.network.ssid:
+                        # Create a mock wifi device from cached data for better performance
+                        class MockWifiDevice:
+                            def __init__(self, network_info):
+                                self.ssid = network_info.ssid
+                                self.freq = network_info.frequency
+                                self.chan = network_info.channel
+                                self.bssid = network_info.bssid
+                                self.rate = network_info.rate
+                                self.mode = network_info.mode
+                                self.security = network_info.security
+                        
+                        wifi_details = MockWifiDevice(network)
                         break
+                
+                # Only force rescan if we need fresh data and didn't find it in cache
+                if not wifi_details:
+                    for wifi in nmcli.device.wifi():
+                        if wifi.ssid == self.network.ssid:
+                            wifi_details = wifi
+                            break
 
                 GLib.idle_add(self._update_advanced_info, wifi_details)
 

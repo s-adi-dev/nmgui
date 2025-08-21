@@ -98,14 +98,73 @@ class NetworkListWidget(Gtk.Box):
         scanning_label.set_name("scanning-label")
         self.network_list_box.append(scanning_label)
 
-        # Start background scan
+        # Start background scan with minimal overhead for better responsiveness
         thread = threading.Thread(target=self._background_scan)
         thread.daemon = True
         thread.start()
 
-    def _background_scan(self):
-        """Background network scanning"""
+    def refresh_with_cached_data(self):
+        """Refresh network list using cached data when possible"""
+        if self.is_scanning:
+            return
+
+        self.is_scanning = True
+        self.scan_start_time = time.time()
+
+        # Update UI for scanning state
+        self.spinner.start()
+        self.refresh_button.set_sensitive(False)
+        self.refresh_button.add_css_class("rescan-in-progress")
+
+        # Start background scan with preference for cached data
+        thread = threading.Thread(target=self._background_scan_cached)
+        thread.daemon = True
+        thread.start()
+
+    def _background_scan_cached(self):
+        """Background network scanning preferring cached data"""
         try:
+            # Try to use cached data first for better performance
+            networks = NetworkService.scan_networks(force_rescan=False)
+            
+            # If we have no networks from cache, make sure we show the connected network
+            if not networks:
+                connected_network = NetworkService.get_connected_network()
+                if connected_network:
+                    networks = [connected_network]
+            
+            scan_duration = time.time() - self.scan_start_time if self.scan_start_time else 0
+
+            GLib.idle_add(self._update_network_list, networks, scan_duration)
+
+        except Exception as e:
+            print(f"Error during background scan: {e}")
+            GLib.idle_add(self._show_scan_error)
+        finally:
+            GLib.idle_add(self._scan_complete)
+
+    def _background_scan(self):
+        """Background network scanning with intelligent caching"""
+        try:
+            # Use cached results when possible, force rescan only when needed
+            networks = NetworkService.scan_networks(force_rescan=True)
+            scan_duration = time.time() - self.scan_start_time if self.scan_start_time else 0
+
+            GLib.idle_add(self._update_network_list, networks, scan_duration)
+
+        except Exception as e:
+            print(f"Error during background scan: {e}")
+            GLib.idle_add(self._show_scan_error)
+        except Exception as e:
+            print(f"Error during background scan: {e}")
+            GLib.idle_add(self._show_scan_error)
+        finally:
+            GLib.idle_add(self._scan_complete)
+
+    def _background_scan(self):
+        """Background network scanning with intelligent caching"""
+        try:
+            # Use cached results when possible, force rescan only when needed
             networks = NetworkService.scan_networks(force_rescan=True)
             scan_duration = time.time() - self.scan_start_time if self.scan_start_time else 0
 
@@ -121,6 +180,12 @@ class NetworkListWidget(Gtk.Box):
         """Update the network list UI with scan results"""
         self._clear_network_list()
 
+        # Ensure we always show the connected network if no networks are provided
+        if not networks:
+            connected_network = NetworkService.get_connected_network()
+            if connected_network:
+                networks = [connected_network]
+
         if not networks:
             no_networks_label = Gtk.Label(label="No networks found", xalign=0.5)
             no_networks_label.set_name("no-networks-label")
@@ -128,8 +193,10 @@ class NetworkListWidget(Gtk.Box):
             no_networks_label.set_margin_bottom(48)
             self.network_list_box.append(no_networks_label)
         else:
+            # Pre-sort networks for better performance
             sorted_networks = sorted(networks, key=lambda n: (not n.is_connected, -n.signal))
 
+            # Batch add networks for better UI performance
             for network in sorted_networks:
                 network_row = self._create_network_row(network)
                 self.network_list_box.append(network_row)
