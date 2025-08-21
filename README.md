@@ -2,6 +2,8 @@
 
 A modern GTK4-based network management application for Linux systems using `nmcli`
 
+![](./assets/interface.png)
+
 ## Features
 
 - Scan and connect to WiFi networks
