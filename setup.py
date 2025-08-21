@@ -8,9 +8,9 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 setup(
     name="nmgui",
-    version="1.0.0",
-    author="Saatvik333",
-    author_email="example@example.com",
+    version="1.1.0",
+    author="Aditya Pratap Singh",
+    author_email="",
     description="A GTK4-based network management application for Linux",
     long_description=long_description,
     long_description_content_type="text/markdown",

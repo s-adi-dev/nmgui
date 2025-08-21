@@ -10,7 +10,7 @@ from gi.repository import Gtk, GLib
 from nmgui.ui.styles import StyleManager
 
 # Application version
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 class NetworkManagerApp(Gtk.Application):
     """Main application class"""
@@ -22,18 +22,18 @@ class NetworkManagerApp(Gtk.Application):
         """Application activation with performance optimizations"""
         # Apply styles early for better perceived performance
         StyleManager.apply_styles()
-        
+
         # Create window
         win = NetworkManagerWindow(self)
         win.present()
-        
+
         # Preload network cache in background for faster initial scan
         def preload_cache():
             try:
                 NetworkService.scan_networks(force_rescan=False)
             except Exception:
                 pass  # Ignore errors in preload
-        
+
         preload_thread = threading.Thread(target=preload_cache)
         preload_thread.daemon = True
         preload_thread.start()

@@ -1,6 +1,6 @@
 # Network Manager GUI (nmgui)
 
-A modern GTK4-based network management application for Linux systems.
+A modern GTK4-based network management application for Linux systems using `nmcli`
 
 ## Features
 
@@ -18,9 +18,32 @@ A modern GTK4-based network management application for Linux systems.
 
 ## Installation
 
+### Arch Linux
+
+Install the binary version from AUR:
+```bash
+yay -S nmgui-bin
+```
+
+### Other Distributions
+
+Download the latest binary from [Releases](https://github.com/s-adi-dev/nmgui/releases):
+
+```bash
+# Download and install
+sudo curl -L https://github.com/s-adi-dev/nmgui/releases/download/v1.1.0/nmgui.bin -o /usr/bin/nmgui
+sudo chmod +x /usr/bin/nmgui
+
+# Install desktop entry (optional)
+curl -sL https://raw.githubusercontent.com/s-adi-dev/nmgui/main/nmgui.desktop | sudo tee /usr/share/applications/nmgui.desktop > /dev/null
+```
+
+**Note:** Only requires NetworkManager to be installed on your system.
+
+### Manual
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/nmgui.git
+   git clone https://github.com/s-adi-dev/nmgui.git
    cd nmgui
    ```
 
@@ -49,6 +72,13 @@ To build a standalone executable, run:
 ```
 
 The executable will be created in the `dist/` directory.
+
+## Hyprland Users
+
+Add this to your config for floating window:
+```ini
+windowrule = float, title:^(.*Network Manager.*)$
+```
 
 ## Development
 

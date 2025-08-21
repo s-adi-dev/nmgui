@@ -26,7 +26,7 @@ Download the latest binary from [Releases](https://github.com/s-adi-dev/nmgui/re
 
 ```bash
 # Download and install
-sudo curl -L https://github.com/s-adi-dev/nmgui/releases/download/v1.0.0/nmgui.bin -o /usr/bin/nmgui
+sudo curl -L https://github.com/s-adi-dev/nmgui/releases/download/v1.1.0/nmgui.bin -o /usr/bin/nmgui
 sudo chmod +x /usr/bin/nmgui
 
 # Install desktop entry (optional)
@@ -82,7 +82,7 @@ For problems related to `python-nmcli`, note that this project uses a fork maint
 
 Pull requests to this fork are welcome, and relevant changes will be forwarded to the original repository.
 
-Contributions of any kind (bug fixes, improvements, or new features) are appreciated. 
+Contributions of any kind (bug fixes, improvements, or new features) are appreciated.
 
 ## License
 

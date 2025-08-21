@@ -6,7 +6,6 @@ build-backend = "setuptools.build_meta"
 name = "nmgui"
 description = "A GTK4-based network management application for Linux"
 readme = "README.md"
-authors = [{name = "Saatvik333", email = "example@example.com"}]
 license = {text = "MIT"}
 classifiers = [
     "Development Status :: 4 - Beta",
