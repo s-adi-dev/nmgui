@@ -26,7 +26,7 @@ Download the latest binary from [Releases](https://github.com/s-adi-dev/nmgui/re
 
 ```bash
 # Download and install
-sudo curl -L https://github.com/s-adi-dev/nmgui/releases/download/v1.0.0/nmgui.bin -o /usr/bin/nmgui
+sudo curl -L https://github.com/s-adi-dev/nmgui/releases/download/v1.0.0/main.bin -o /usr/bin/nmgui
 sudo chmod +x /usr/bin/nmgui
 
 # Install desktop entry (optional)
