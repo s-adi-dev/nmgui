@@ -3,7 +3,7 @@ import gi
 from models import NetworkInfo, WiFiState
 from ui.network_list import NetworkListWidget
 gi.require_version("Gtk", "4.0")
-from gi.repository import Gtk, GLib
+from gi.repository import Gtk, Gdk, GLib
 from typing import Optional
 
 from network_service import NetworkService 
@@ -23,6 +23,11 @@ class NetworkManagerWindow(Gtk.ApplicationWindow):
         self.current_view = "list"  # "list" or "details"
         self._setup_ui()
         self._update_wifi_state(initial_load=True)
+
+        # keypress logic for handling ESC
+        key_controller = Gtk.EventControllerKey.new()
+        key_controller.connect("key-pressed", self._on_esc_pressed)
+        self.add_controller(key_controller)
     
     def _setup_ui(self):
         """Setup the main UI"""
@@ -163,4 +168,25 @@ class NetworkManagerWindow(Gtk.ApplicationWindow):
         if self.current_view == "list" and hasattr(self, 'network_list'):
             self.network_list.start_scan()
         
+        return False
+
+    def _on_esc_pressed(self, controller, keyval, keycode, state):
+        """Back on details with ESC; quit from main list."""
+        try:
+            if keyval == Gdk.KEY_Escape:
+                # If we're on a details page, go back to the list instead of quitting
+                if getattr(self, "current_view", "list") == "details":
+                    # (False means: don't force an immediate rescan; adjust if you prefer)
+                    self._show_network_list(True)
+                    return True
+
+                # Otherwise we're on the main page; quit the app
+                app = self.get_application()
+                if app is not None:
+                    app.quit()
+                else:
+                    self.close()
+                return True
+        except Exception as e:
+            print(f"Error while closing app using Esc: {e}")
         return False
