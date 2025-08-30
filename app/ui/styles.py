@@ -101,14 +101,11 @@ class StyleManager:
     def apply_styles(cls):
         """Apply CSS styles to the application"""
         css_provider = Gtk.CssProvider()
-
         # Test if the ~/.config/nmgui/style.css exists
         home_path = os.path.expanduser("~")
         if os.path.exists(f"{home_path}/.config/nmgui/style.css"):
-            print("Using style CSS")
             css_provider.load_from_path(f"{home_path}/.config/nmgui/style.css")
         else:
-            print("No config found, using default css")
             css_provider.load_from_data(cls.CSS_STYLES)
 
         display = Gdk.Display.get_default()
