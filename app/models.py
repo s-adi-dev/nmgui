@@ -4,16 +4,20 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
 
+
 class WiFiState(Enum):
     """Enum for WiFi states"""
+
     OFF = "off"
     ON = "on"
     SCANNING = "scanning"
     CONNECTING = "connecting"
 
+
 @dataclass
 class NetworkInfo:
     """Data class for network information"""
+
     ssid: str
     signal: int
     requires_password: bool
@@ -24,7 +28,7 @@ class NetworkInfo:
     rate: Optional[int] = None
     mode: Optional[str] = None
     security: Optional[str] = None
-    
+
     @classmethod
     def from_wifi_device(cls, wifi_device):
         """Create NetworkInfo from nmcli wifi device"""
@@ -38,5 +42,5 @@ class NetworkInfo:
             channel=wifi_device.chan,
             rate=wifi_device.rate,
             mode=wifi_device.mode,
-            security=wifi_device.security
+            security=wifi_device.security,
         )
