@@ -12,7 +12,7 @@ class StyleManager:
     """Handles CSS styling for the application"""
 
     CSS_STYLES = b"""
-    #wifi-label {
+    #wifi-label, #ethernet-label {
         font-weight: bold;
         font-size: 16px;
     }

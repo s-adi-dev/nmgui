@@ -8,6 +8,7 @@ from typing import Optional
 
 from gi.repository import Gdk, GLib, Gtk
 from network_service import NetworkService
+from ethernet_service import EthernetService
 
 from ui.dialogs import PasswordDialog
 from ui.network_details import NetworkDetailsWidget
@@ -40,6 +41,9 @@ class NetworkManagerWindow(Gtk.ApplicationWindow):
         main_box.set_margin_start(20)
         main_box.set_margin_end(20)
 
+        main_box.append(self._create_ethernet_toggle())
+        main_box.append(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
+
         main_box.append(self._create_wifi_toggle())
         main_box.append(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
 
@@ -47,6 +51,32 @@ class NetworkManagerWindow(Gtk.ApplicationWindow):
         main_box.append(self.content_box)
 
         self.set_child(main_box)
+
+    def _create_ethernet_toggle(self) -> Gtk.Box:
+        """Create the Ethernet toggle section"""
+        self.ethernet_switch = Gtk.Switch(valign=Gtk.Align.CENTER)
+        self.ethernet_switch.set_sensitive(EthernetService.is_ethernet_available())
+        self.ethernet_switch.set_active(EthernetService.get_ethernet_status())
+        self.ethernet_switch.connect("state-set", self._on_ethernet_toggled)
+
+        ethernet_label = Gtk.Label(label="Ethernet", xalign=0, name="ethernet-label")
+
+        toggle_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        toggle_box.append(ethernet_label)
+        toggle_box.append(Gtk.Box(hexpand=True))  # Spacer
+        toggle_box.append(self.ethernet_switch)
+
+        return toggle_box
+
+    def _on_ethernet_toggled(self, switch, state):
+        """Handle Ethernet toggle"""
+        current_state = EthernetService.get_ethernet_status()
+
+        if current_state == state:
+            return
+
+        if EthernetService.toggle_ethernet(state):
+            switch.set_active(state)
 
     def _create_wifi_toggle(self) -> Gtk.Box:
         """Create the WiFi toggle section"""
