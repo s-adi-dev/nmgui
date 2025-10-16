@@ -137,3 +137,22 @@ class EthernetService:
                 return True
 
             return False
+
+    @staticmethod
+    def toggle_ethernet(state: bool) -> bool:
+        """Enable or disable Ethernet"""
+        try:
+            current_state = EthernetService.get_ethernet_status()
+            if current_state == state:
+                return True
+
+            if state:
+                nmcli._syscmd.nmcli(["device", "connect", EthernetService.get_device()])
+            else:
+                nmcli._syscmd.nmcli(
+                    ["device", "disconnect", EthernetService.get_device()]
+                )
+            return True
+        except Exception as e:
+            print(f"Error toggling Ethernet: {e}")
+            return False
