@@ -68,3 +68,72 @@ class EthernetService:
                 return dev
 
         return None
+
+    @staticmethod
+    def get_device() -> str | None:
+        details = EthernetService.get_device_details()
+
+        if details == None:
+            return None
+
+        return details.get("GENERAL.DEVICE")
+
+    @overload
+    @staticmethod
+    def get_ethernet_status() -> bool: ...
+    @overload
+    @staticmethod
+    def get_ethernet_status(details: EthernetDetails) -> bool: ...
+
+    def get_ethernet_status(details: EthernetDetails | None = None) -> bool:
+        if details == None:
+            details = EthernetService.get_device_details()
+
+            # no ethernet device available
+            if details == None:
+                return False
+
+            state = int(details.get("GENERAL.STATE").split(" ")[0])
+
+            if state == 100:
+                return True
+
+            return False
+
+        # if details is an EthernetDetails object
+        else:
+            if details.state == "connected":
+                return True
+
+            return False
+
+    @overload
+    @staticmethod
+    def is_ethernet_available() -> bool: ...
+
+    @overload
+    @staticmethod
+    def is_ethernet_available(details: EthernetDetails) -> bool: ...
+
+    def is_ethernet_available(details: EthernetDetails | None = None) -> bool:
+        if details == None:
+            details = EthernetService.get_device_details()
+
+            # no ethernet device available
+            if details == None:
+                return False
+
+            state = int(details.get("GENERAL.STATE").split(" ")[0])
+
+            # if state is disconnected or connected, then its available
+            if state == 30 or state == 100:
+                return True
+
+            return False
+
+        # if details is an EthernetDetails object
+        else:
+            if details.state != "unavailable":
+                return True
+
+            return False
