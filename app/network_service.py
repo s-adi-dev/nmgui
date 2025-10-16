@@ -114,7 +114,11 @@ class NetworkService:
         """Check if WiFi network is already known/saved"""
         try:
             connections = nmcli.connection()
-            return any(conn.name == ssid for conn in connections)
+            return any(
+                nmcli.connection.show(conn.uuid).get("802-11-wireless.ssid") != None
+                and nmcli.connection.show(conn.uuid).get("802-11-wireless.ssid") == ssid
+                for conn in connections
+            )
         except Exception as e:
             print(f"Error checking known networks: {e}")
             return False
