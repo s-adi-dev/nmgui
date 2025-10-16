@@ -1,9 +1,9 @@
 import nmcli
-from typing import Literal
+from typing import Literal, overload
 from nmcli.data.device import DeviceDetails
 
 
-class EthernetDevice:
+class EthernetDetails:
     device: str
     hwaddr: str
     name: str
@@ -13,14 +13,9 @@ class EthernetDevice:
 
     def __init__(self):
         # pass device object to parser
-        self._parse_data(self.find_device())
-
-    @staticmethod
-    def find_device() -> DeviceDetails:
-        # find device with ethernet type
-        for dev in nmcli.device.show_all():
-            if dev.get("GENERAL.TYPE") == "ethernet":
-                return dev
+        details = EthernetService.get_device_details()
+        if details != None:
+            self._parse_data(details)
 
     def _parse_data(self, eth_dev: DeviceDetails) -> None:
         # parses the information and add to properties
@@ -49,7 +44,9 @@ class EthernetDevice:
 
     # not really a scan, but keeping consistent naming with network_service
     def rescan(self) -> None:
-        self._parse_data(EthernetDevice.find_device())
+        details = EthernetService.get_device_details()
+        if details != None:
+            self._parse_data(details)
 
     # FIXME: delete later
     def test_print(self):
@@ -59,3 +56,15 @@ class EthernetDevice:
         print(self.ipaddr)
         print(self.gateway_addr)
         print(self.state)
+
+
+class EthernetService:
+
+    @staticmethod
+    def get_device_details() -> DeviceDetails | None:
+        # find device with ethernet type
+        for dev in nmcli.device.show_all():
+            if dev.get("GENERAL.TYPE") == "ethernet":
+                return dev
+
+        return None
