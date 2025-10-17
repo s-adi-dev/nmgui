@@ -1,15 +1,15 @@
 import gi
-from ui.utils import UIUtils
+from ui.ethernet_details import EthernetDetailsWidget
 from models import NetworkInfo, WiFiState
 
 from ui.network_list import NetworkListWidget
 
 gi.require_version("Gtk", "4.0")
-from typing import Callable, Optional
+from typing import Optional
 
 from gi.repository import Gdk, GLib, Gtk
 from network_service import NetworkService
-from ethernet_service import EthernetService, EthernetDetails
+from ethernet_service import EthernetService
 
 from ui.dialogs import PasswordDialog
 from ui.network_details import NetworkDetailsWidget
@@ -44,13 +44,8 @@ class NetworkManagerWindow(Gtk.ApplicationWindow):
 
         main_box.append(self._create_ethernet_toggle())
         main_box.append(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
-        main_box.append(self._create_ethernet_header())
-
-        self.ethernet_content = Gtk.Box(
-            orientation=Gtk.Orientation.VERTICAL, spacing=12
-        )
-        main_box.append(self.ethernet_content)
-        self._show_ethernet_content()
+        self.ethernet_details_widget = EthernetDetailsWidget(self.ethernet_switch)
+        main_box.append(self.ethernet_details_widget)
 
         main_box.append(Gtk.Box(hexpand=True))  # spacer
 
@@ -90,91 +85,7 @@ class NetworkManagerWindow(Gtk.ApplicationWindow):
         if EthernetService.toggle_ethernet(state):
             switch.set_active(state)
 
-        self._update_ethernet()
-
-    def _create_ethernet_header(self) -> Gtk.Box:
-        self.ethernet_scan_label = Gtk.Label(
-            label="Refresh", name="ethernet-scan-label"
-        )
-        self.ethernet_scan_label.set_cursor_from_name("pointer")
-        self.ethernet_scan_label.add_controller(
-            self._create_click_controller(self._update_ethernet)
-        )
-
-        self.spinner = Gtk.Spinner()
-        self.spinner.set_size_request(20, 20)
-
-        self.ethernet_label = Gtk.Label(
-            label=EthernetDetails().name or "Not Connected",
-            xalign=0,
-            name="ethernet-name-label",
-        )
-
-        header_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        header_box.append(self.ethernet_label)
-        header_box.append(Gtk.Box(hexpand=True))  # Spacer
-        header_box.append(self.spinner)
-        header_box.append(self.ethernet_scan_label)
-
-        return header_box
-
-    def _create_click_controller(self, callback: Callable):
-        """Create a click controller for a label"""
-        controller = Gtk.GestureClick()
-        controller.set_button(0)
-        controller.connect("pressed", lambda *args: callback())
-        return controller
-
-    def _clear_ethernet_content(self):
-        child = self.ethernet_content.get_first_child()
-        while child:
-            next_child = child.get_next_sibling()
-            self.ethernet_content.remove(child)
-            child = next_child
-
-    def _show_ethernet_content(self):
-        if not EthernetService.is_ethernet_available():
-            return
-
-        details = EthernetDetails()
-
-        self.ethernet_content.append(
-            UIUtils.create_detail_row(
-                "Network Status",
-                details.state.title(),
-                "network-transmit-receive-symbolic",
-            )
-        )
-        self.ethernet_content.append(
-            UIUtils.create_detail_row(
-                "IP Address", details.ipaddr, "network-workgroup-symbolic"
-            )
-        )
-        self.ethernet_content.append(
-            UIUtils.create_detail_row(
-                "MAC Address", details.hwaddr, "network-wired-symbolic"
-            )
-        )
-
-    def _update_ethernet(self):
-        self.spinner.start()
-        self.ethernet_scan_label.set_sensitive(False)
-        self.ethernet_scan_label.add_css_class("rescan-in-progress")
-
-        self.ethernet_label.set_label(EthernetDetails().name or "Not Connected")
-
-        if EthernetService.is_ethernet_available():
-            self._clear_ethernet_content()
-            self._show_ethernet_content()
-            self.ethernet_switch.set_sensitive(True)
-        else:
-            self._clear_ethernet_content()
-            self.ethernet_switch.set_active(False)
-            self.ethernet_switch.set_sensitive(False)
-
-        self.spinner.stop()
-        self.ethernet_scan_label.set_sensitive(True)
-        self.ethernet_scan_label.remove_css_class("rescan-in-progress")
+        self.ethernet_details_widget.update()
 
     def _create_wifi_toggle(self) -> Gtk.Box:
         """Create the WiFi toggle section"""
