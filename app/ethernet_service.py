@@ -18,7 +18,7 @@ class EthernetDetails:
             self._parse_data(details)
 
     def _parse_data(self, eth_dev: DeviceDetails) -> None:
-        # parses the information and add to properties
+        """parses the information from eth_dev and add to properties"""
         self.device = eth_dev.get("GENERAL.DEVICE")
         self.hwaddr = eth_dev.get("GENERAL.HWADDR")
         self.name = eth_dev.get("GENERAL.CONNECTION")
@@ -42,26 +42,11 @@ class EthernetDetails:
         else:
             self.state = "unavailable"
 
-    # not really a scan, but keeping consistent naming with network_service
-    def rescan(self) -> None:
-        details = EthernetService.get_device_details()
-        if details != None:
-            self._parse_data(details)
-
-    # FIXME: delete later
-    def test_print(self):
-        print(self.device)
-        print(self.name)
-        print(self.hwaddr)
-        print(self.ipaddr)
-        print(self.gateway_addr)
-        print(self.state)
-
 
 class EthernetService:
-
     @staticmethod
     def get_device_details() -> DeviceDetails | None:
+        """Get the DeviceDetails object of the ethernet device"""
         # find device with ethernet type
         for dev in nmcli.device.show_all():
             if dev.get("GENERAL.TYPE") == "ethernet":
@@ -71,6 +56,7 @@ class EthernetService:
 
     @staticmethod
     def get_device() -> str | None:
+        """Get the ethernet device's identifier"""
         details = EthernetService.get_device_details()
 
         if details == None:
@@ -80,10 +66,15 @@ class EthernetService:
 
     @overload
     @staticmethod
-    def get_ethernet_status() -> bool: ...
+    def get_ethernet_status() -> bool:
+        """Get the status of the ethernet, True for connected, if not, False. Will always return False if ethernet is not available."""
+        pass
+
     @overload
     @staticmethod
-    def get_ethernet_status(details: EthernetDetails) -> bool: ...
+    def get_ethernet_status(details: EthernetDetails) -> bool:
+        """Get the status of the ethernet from the details, True for connected, if not, False. Will always return False if ethernet is not available."""
+        pass
 
     def get_ethernet_status(details: EthernetDetails | None = None) -> bool:
         if details == None:
@@ -109,11 +100,15 @@ class EthernetService:
 
     @overload
     @staticmethod
-    def is_ethernet_available() -> bool: ...
+    def is_ethernet_available() -> bool:
+        """Check if ethernet is available and able to be connected. This is different from status."""
+        pass
 
     @overload
     @staticmethod
-    def is_ethernet_available(details: EthernetDetails) -> bool: ...
+    def is_ethernet_available(details: EthernetDetails) -> bool:
+        """Check if ethernet is available and able to be connected from the details. This is different from status."""
+        pass
 
     def is_ethernet_available(details: EthernetDetails | None = None) -> bool:
         if details == None:

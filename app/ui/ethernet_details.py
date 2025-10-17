@@ -19,6 +19,8 @@ class EthernetDetailsWidget(Gtk.Box):
         super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=10)
 
         self.content = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+
+        # an ethernet_switch parameter is passed to the widget so that we can set the switch's state on update
         self.switch = ethernet_switch
 
         self._create_header()
