@@ -12,17 +12,17 @@ class StyleManager:
     """Handles CSS styling for the application"""
 
     CSS_STYLES = b"""
-    #wifi-label {
+    #wifi-label, #ethernet-label {
         font-weight: bold;
         font-size: 16px;
     }
 
-    #wifi-networks-label {
+    #wifi-networks-label, #ethernet-name-label {
         font-weight: bold;
         font-size: 14px;
     }
 
-    #wifi-scan-label {
+    #wifi-scan-label, #ethernet-scan-label {
         font-size: 14px;
     }
 
