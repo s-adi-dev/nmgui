@@ -1,3 +1,4 @@
+import os
 import re
 import time
 import nmcli
@@ -9,6 +10,7 @@ from typing import List, Tuple, Optional
 from models import NetworkInfo
 
 nmcli.disable_use_sudo()
+nmcli.set_lang(os.environ.get("LANG") or "C.UTF-8")
 
 class NmcliExtensions:
     """Extended functionalities for nmcli package"""
