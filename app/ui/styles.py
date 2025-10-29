@@ -1,5 +1,6 @@
 """CSS styling for the application"""
 
+import os
 import gi
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk, Gdk
@@ -97,7 +98,13 @@ class StyleManager:
     def apply_styles(cls):
         """Apply CSS styles to the application"""
         css_provider = Gtk.CssProvider()
-        css_provider.load_from_data(cls.CSS_STYLES)
+
+        home_path = os.path.expanduser("~")
+
+        if os.path.exists(f"{home_path}/.config/nmgui/style.css"):
+            css_provider.load_from_path(f"{home_path}/.config/nmgui/style.css")
+        else:
+            css_provider.load_from_data(cls.CSS_STYLES)
         
         display = Gdk.Display.get_default()
         Gtk.StyleContext.add_provider_for_display(
